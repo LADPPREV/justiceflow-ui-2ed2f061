@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Label } from "@/components/ui/label";
 import { Eye, Pencil, Trash2, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
+import { Users } from "lucide-react";
 
 const Clientes = () => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const Clientes = () => {
     setShowDelete(true);
   };
 
-  const ClienteForm = ({ onSubmit, submitLabel }: { onSubmit: () => void; submitLabel: string }) => (
+  const formFields = (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Nome *</Label>
@@ -84,9 +85,6 @@ const Clientes = () => {
         <Label>Benefício Desejado *</Label>
         <Input value={form.beneficioDesejado} onChange={(e) => setForm({ ...form, beneficioDesejado: e.target.value })} />
       </div>
-      <DialogFooter>
-        <Button onClick={onSubmit}>{submitLabel}</Button>
-      </DialogFooter>
     </div>
   );
 
@@ -161,7 +159,10 @@ const Clientes = () => {
             <DialogTitle>Novo Cliente</DialogTitle>
             <DialogDescription>Preencha os dados para cadastrar um novo cliente.</DialogDescription>
           </DialogHeader>
-          <ClienteForm onSubmit={handleAdd} submitLabel="Cadastrar" />
+          {formFields}
+          <DialogFooter>
+            <Button onClick={handleAdd}>Cadastrar</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -172,7 +173,10 @@ const Clientes = () => {
             <DialogTitle>Editar Cliente</DialogTitle>
             <DialogDescription>Altere os dados do cliente selecionado.</DialogDescription>
           </DialogHeader>
-          <ClienteForm onSubmit={handleEdit} submitLabel="Salvar" />
+          {formFields}
+          <DialogFooter>
+            <Button onClick={handleEdit}>Salvar</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -194,8 +198,5 @@ const Clientes = () => {
     </div>
   );
 };
-
-// Need Users icon import for empty state
-import { Users } from "lucide-react";
 
 export default Clientes;
