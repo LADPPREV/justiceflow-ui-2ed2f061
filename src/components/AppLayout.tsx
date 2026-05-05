@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { Users, Briefcase, LogOut, Scale, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { toast } from "sonner";
 
 const navItems = [
@@ -67,17 +67,15 @@ const AppLayout = () => {
       <div className="flex-1 flex flex-col min-h-screen min-w-0">
         <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4 sm:px-6 shrink-0 gap-2">
           <div className="flex items-center gap-2">
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden"
-                onClick={() => setMobileOpen(true)}
-                aria-label="Abrir menu"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Abrir menu"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
             <div className="md:hidden flex items-center gap-2">
               <Scale className="h-5 w-5 text-primary" />
               <span className="font-bold text-foreground" style={{ fontFamily: "'Playfair Display', serif" }}>
