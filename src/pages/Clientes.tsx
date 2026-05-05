@@ -92,15 +92,15 @@ const Clientes = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-2xl font-bold text-foreground">Clientes</h1>
-        <Button onClick={() => { resetForm(); setShowAdd(true); }}>
+        <Button onClick={() => { resetForm(); setShowAdd(true); }} className="w-full sm:w-auto">
           <Plus className="h-4 w-4 mr-2" />
           Novo Cliente
         </Button>
       </div>
 
-      <div className="relative max-w-sm">
+      <div className="relative w-full sm:max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Buscar por nome ou CPF..."
@@ -117,22 +117,25 @@ const Clientes = () => {
           <p className="text-sm">Tente buscar por outro termo ou cadastre um novo cliente.</p>
         </div>
       ) : (
-        <div className="bg-card rounded-lg border">
+        <div className="bg-card rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>CPF</TableHead>
-                <TableHead>Benefício Desejado</TableHead>
+                <TableHead className="hidden sm:table-cell">CPF</TableHead>
+                <TableHead className="hidden md:table-cell">Benefício Desejado</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((c) => (
                 <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.nome}</TableCell>
-                  <TableCell>{c.cpf}</TableCell>
-                  <TableCell>{c.beneficioDesejado}</TableCell>
+                  <TableCell className="font-medium">
+                    {c.nome}
+                    <div className="sm:hidden text-xs text-muted-foreground mt-1">{c.cpf}</div>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">{c.cpf}</TableCell>
+                  <TableCell className="hidden md:table-cell">{c.beneficioDesejado}</TableCell>
                   <TableCell className="text-right space-x-1">
                     <Button variant="ghost" size="icon" onClick={() => navigate(`/clientes/${c.id}`)} title="Visualizar">
                       <Eye className="h-4 w-4" />

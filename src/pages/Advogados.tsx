@@ -26,9 +26,9 @@ const Advogados = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-2xl font-bold text-foreground">Advogados</h1>
-        <Button onClick={() => { setForm({ nome: "", cpf: "", email: "" }); setShowAdd(true); }}>
+        <Button onClick={() => { setForm({ nome: "", cpf: "", email: "" }); setShowAdd(true); }} className="w-full sm:w-auto">
           <Plus className="h-4 w-4 mr-2" />
           Novo Advogado
         </Button>
@@ -40,21 +40,27 @@ const Advogados = () => {
           <p className="text-lg font-medium">Nenhum advogado cadastrado</p>
         </div>
       ) : (
-        <div className="bg-card rounded-lg border">
+        <div className="bg-card rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nome</TableHead>
-                <TableHead>CPF</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead className="hidden sm:table-cell">CPF</TableHead>
+                <TableHead className="hidden md:table-cell">Email</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {advogados.map((a) => (
                 <TableRow key={a.id}>
-                  <TableCell className="font-medium">{a.nome}</TableCell>
-                  <TableCell>{a.cpf}</TableCell>
-                  <TableCell>{a.email}</TableCell>
+                  <TableCell className="font-medium">
+                    {a.nome}
+                    <div className="sm:hidden text-xs text-muted-foreground mt-1 space-y-0.5">
+                      <div>{a.cpf}</div>
+                      <div className="truncate">{a.email}</div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">{a.cpf}</TableCell>
+                  <TableCell className="hidden md:table-cell">{a.email}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

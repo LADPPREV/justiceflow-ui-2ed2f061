@@ -60,7 +60,7 @@ const ClienteDetalhe = () => {
         Voltar para Clientes
       </Button>
 
-      <h1 className="text-2xl font-bold text-foreground">{clienteBase.nome}</h1>
+      <h1 className="text-2xl font-bold text-foreground break-words">{clienteBase.nome}</h1>
 
       {/* Dados Cadastrais */}
       <Card>
@@ -91,9 +91,9 @@ const ClienteDetalhe = () => {
 
       {/* Movimentações */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 space-y-0">
           <CardTitle className="text-lg">Movimentações do Processo</CardTitle>
-          <Button size="sm" onClick={() => setShowAdd(true)}>
+          <Button size="sm" onClick={() => setShowAdd(true)} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Nova Movimentação
           </Button>
@@ -111,7 +111,7 @@ const ClienteDetalhe = () => {
                   <div className="absolute -left-[1.85rem] top-1 h-3 w-3 rounded-full bg-primary border-2 border-card" />
                   <div className="space-y-1">
                     <p className="font-medium text-sm text-foreground">{mov.descricao}</p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         {new Date(mov.data).toLocaleDateString("pt-BR")}
