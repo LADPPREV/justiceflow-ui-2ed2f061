@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus, Search, ChevronRight } from "lucide-react";
+import { Plus, Search, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { Users } from "lucide-react";
 
@@ -15,9 +15,7 @@ const Clientes = () => {
   const [clientes, setClientes] = useState<Cliente[]>(clientesMock);
   const [busca, setBusca] = useState("");
   const [showAdd, setShowAdd] = useState(false);
-  const [showDelete, setShowDelete] = useState(false);
-  const [selected, setSelected] = useState<Cliente | null>(null);
-  const [form, setForm] = useState({ nome: "", cpf: "", senhaINSS: "", beneficioDesejado: "" });
+  const [form, setForm] = useState({ nome: "", cpf: "", senhaINSS: "", beneficioDesejado: "", agenteCaso: "", indicadoPor: "" });
 
   const filtered = clientes.filter(
     (c) =>
@@ -25,32 +23,23 @@ const Clientes = () => {
       c.cpf.includes(busca)
   );
 
-  const resetForm = () => setForm({ nome: "", cpf: "", senhaINSS: "", beneficioDesejado: "" });
+  const resetForm = () => setForm({ nome: "", cpf: "", senhaINSS: "", beneficioDesejado: "", agenteCaso: "", indicadoPor: "" });
 
   const handleAdd = () => {
-    if (!form.nome || !form.cpf || !form.beneficioDesejado) {
+    if (!form.nome || !form.cpf || !form.beneficioDesejado || !form.agenteCaso) {
       toast.error("Preencha os campos obrigatórios.");
       return;
     }
-    const novo: Cliente = { ...form, id: Date.now().toString(), movimentacoes: [] };
+    const novo: Cliente = {
+      ...form,
+      indicadoPor: form.agenteCaso === "Indicação" ? form.indicadoPor : undefined,
+      id: Date.now().toString(),
+      movimentacoes: [],
+    };
     setClientes([...clientes, novo]);
     setShowAdd(false);
     resetForm();
     toast.success("Cliente cadastrado com sucesso!");
-  };
-
-  const handleDelete = () => {
-    if (!selected) return;
-    setClientes(clientes.filter((c) => c.id !== selected.id));
-    setShowDelete(false);
-    setSelected(null);
-    toast.success("Cliente excluído com sucesso!");
-  };
-
-  const openDelete = (e: React.MouseEvent, c: Cliente) => {
-    e.stopPropagation();
-    setSelected(c);
-    setShowDelete(true);
   };
 
   const formFields = (
@@ -71,6 +60,24 @@ const Clientes = () => {
         <Label>Benefício Desejado *</Label>
         <Input value={form.beneficioDesejado} onChange={(e) => setForm({ ...form, beneficioDesejado: e.target.value })} />
       </div>
+      <div className="space-y-2">
+        <Label>Agente do Caso *</Label>
+        <Input
+          value={form.agenteCaso}
+          onChange={(e) => setForm({ ...form, agenteCaso: e.target.value })}
+          placeholder="Ex: Indicação, Instagram, Facebook..."
+        />
+      </div>
+      {form.agenteCaso.trim().toLowerCase() === "indicação" || form.agenteCaso.trim().toLowerCase() === "indicacao" ? (
+        <div className="space-y-2">
+          <Label>Indicado por</Label>
+          <Input
+            value={form.indicadoPor}
+            onChange={(e) => setForm({ ...form, indicadoPor: e.target.value })}
+            placeholder="Nome de quem indicou"
+          />
+        </div>
+      ) : null}
     </div>
   );
 
@@ -125,9 +132,6 @@ const Clientes = () => {
                   <TableCell className="hidden sm:table-cell">{c.cpf}</TableCell>
                   <TableCell className="hidden md:table-cell">{c.beneficioDesejado}</TableCell>
                   <TableCell className="text-right space-x-1">
-                    <Button variant="ghost" size="icon" onClick={(e) => openDelete(e, c)} title="Excluir" className="text-destructive hover:text-destructive">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                     <ChevronRight className="h-4 w-4 inline-block text-muted-foreground" />
                   </TableCell>
                 </TableRow>
@@ -147,22 +151,6 @@ const Clientes = () => {
           {formFields}
           <DialogFooter>
             <Button onClick={handleAdd}>Cadastrar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Dialog */}
-      <Dialog open={showDelete} onOpenChange={setShowDelete}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar Exclusão</DialogTitle>
-            <DialogDescription>
-              Tem certeza que deseja excluir o cliente <strong>{selected?.nome}</strong>? Esta ação não pode ser desfeita.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDelete(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete}>Excluir</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
