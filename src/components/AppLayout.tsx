@@ -4,6 +4,7 @@ import { Users, Briefcase, LogOut, Scale, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import sidebarMascot from "@/assets/sidebar-mascot.png";
 
 const navItems = [
   { to: "/clientes", label: "Clientes", icon: Users },
@@ -19,7 +20,7 @@ const AppLayout = () => {
     navigate("/");
   };
 
-  const SidebarContents = ({ onNavigate }: { onNavigate?: () => void }) => (
+  const SidebarContents = ({ onNavigate, showMascot = false }: { onNavigate?: () => void; showMascot?: boolean }) => (
     <div className="h-full flex flex-col bg-sidebar text-sidebar-foreground">
       <div className="p-6 flex items-center gap-3 border-b border-sidebar-border">
         <Scale className="h-7 w-7 text-sidebar-primary" />
@@ -46,6 +47,11 @@ const AppLayout = () => {
           </NavLink>
         ))}
       </nav>
+      {showMascot && (
+        <div className="p-4 flex justify-center">
+          <img src={sidebarMascot} alt="Mascote" className="w-40 h-auto select-none pointer-events-none" />
+        </div>
+      )}
     </div>
   );
 
@@ -59,7 +65,7 @@ const AppLayout = () => {
       {/* Mobile Sidebar */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="p-0 w-64 bg-sidebar border-sidebar-border">
-          <SidebarContents onNavigate={() => setMobileOpen(false)} />
+          <SidebarContents onNavigate={() => setMobileOpen(false)} showMascot />
         </SheetContent>
       </Sheet>
 
