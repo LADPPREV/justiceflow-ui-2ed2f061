@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { clientesMock, type Movimentacao } from "@/data/mockData";
+import { clientesMock, type Movimentacao, type Cliente } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Plus, Calendar, User, FileText } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, User, FileText, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const ClienteDetalhe = () => {
@@ -15,14 +15,27 @@ const ClienteDetalhe = () => {
   const navigate = useNavigate();
   const clienteBase = clientesMock.find((c) => c.id === id);
 
+  const [cliente, setCliente] = useState<Cliente | undefined>(clienteBase);
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>(
     clienteBase?.movimentacoes || []
   );
-  const [showAdd, setShowAdd] = useState(false);
-  const [novaDesc, setNovaDesc] = useState("");
-  const [novaData, setNovaData] = useState("");
 
-  if (!clienteBase) {
+  const [showMovForm, setShowMovForm] = useState(false);
+  const [editingMov, setEditingMov] = useState<Movimentacao | null>(null);
+  const [movForm, setMovForm] = useState({ titulo: "", descricao: "", data: "" });
+
+  const [viewMov, setViewMov] = useState<Movimentacao | null>(null);
+  const [deleteMov, setDeleteMov] = useState<Movimentacao | null>(null);
+
+  const [showEditCliente, setShowEditCliente] = useState(false);
+  const [clienteForm, setClienteForm] = useState({
+    nome: clienteBase?.nome || "",
+    cpf: clienteBase?.cpf || "",
+    senhaINSS: clienteBase?.senhaINSS || "",
+    beneficioDesejado: clienteBase?.beneficioDesejado || "",
+  });
+
+  if (!cliente) {
     return (
       <div className="text-center py-16 text-muted-foreground">
         <p className="text-lg font-medium">Cliente não encontrado</p>
@@ -33,22 +46,60 @@ const ClienteDetalhe = () => {
     );
   }
 
-  const handleAddMov = () => {
-    if (!novaDesc || !novaData) {
+  const openNewMov = () => {
+    setEditingMov(null);
+    setMovForm({ titulo: "", descricao: "", data: "" });
+    setShowMovForm(true);
+  };
+
+  const openEditMov = (mov: Movimentacao) => {
+    setEditingMov(mov);
+    setMovForm({ titulo: mov.titulo, descricao: mov.descricao, data: mov.data });
+    setViewMov(null);
+    setShowMovForm(true);
+  };
+
+  const handleSaveMov = () => {
+    if (!movForm.titulo || !movForm.descricao || !movForm.data) {
       toast.error("Preencha todos os campos.");
       return;
     }
-    const nova: Movimentacao = {
-      id: Date.now().toString(),
-      descricao: novaDesc,
-      data: novaData,
-      advogado: "Dr. Carlos Mendes",
-    };
-    setMovimentacoes([...movimentacoes, nova].sort((a, b) => a.data.localeCompare(b.data)));
-    setShowAdd(false);
-    setNovaDesc("");
-    setNovaData("");
-    toast.success("Movimentação adicionada!");
+    if (editingMov) {
+      setMovimentacoes(
+        movimentacoes.map((m) =>
+          m.id === editingMov.id ? { ...m, ...movForm } : m
+        )
+      );
+      toast.success("Movimentação atualizada!");
+    } else {
+      const nova: Movimentacao = {
+        id: Date.now().toString(),
+        ...movForm,
+        advogado: "Dr. Carlos Mendes",
+      };
+      setMovimentacoes([...movimentacoes, nova]);
+      toast.success("Movimentação adicionada!");
+    }
+    setShowMovForm(false);
+    setEditingMov(null);
+  };
+
+  const handleDeleteMov = () => {
+    if (!deleteMov) return;
+    setMovimentacoes(movimentacoes.filter((m) => m.id !== deleteMov.id));
+    setDeleteMov(null);
+    setViewMov(null);
+    toast.success("Movimentação excluída!");
+  };
+
+  const handleEditCliente = () => {
+    if (!clienteForm.nome || !clienteForm.cpf || !clienteForm.beneficioDesejado) {
+      toast.error("Preencha os campos obrigatórios.");
+      return;
+    }
+    setCliente({ ...cliente, ...clienteForm });
+    setShowEditCliente(false);
+    toast.success("Cliente atualizado com sucesso!");
   };
 
   const sorted = [...movimentacoes].sort((a, b) => a.data.localeCompare(b.data));
@@ -60,30 +111,37 @@ const ClienteDetalhe = () => {
         Voltar para Clientes
       </Button>
 
-      <h1 className="text-2xl font-bold text-foreground break-words">{clienteBase.nome}</h1>
+      <h1 className="text-2xl font-bold text-foreground break-words">{cliente.nome}</h1>
 
       {/* Dados Cadastrais */}
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 space-y-0">
           <CardTitle className="text-lg">Dados Cadastrais</CardTitle>
+          <Button size="sm" variant="outline" onClick={() => {
+            setClienteForm({ nome: cliente.nome, cpf: cliente.cpf, senhaINSS: cliente.senhaINSS, beneficioDesejado: cliente.beneficioDesejado });
+            setShowEditCliente(true);
+          }} className="w-full sm:w-auto">
+            <Pencil className="h-4 w-4 mr-2" />
+            Editar
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-muted-foreground">Nome</span>
-              <p className="font-medium">{clienteBase.nome}</p>
+              <p className="font-medium">{cliente.nome}</p>
             </div>
             <div>
               <span className="text-muted-foreground">CPF</span>
-              <p className="font-medium">{clienteBase.cpf}</p>
+              <p className="font-medium">{cliente.cpf}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Senha INSS</span>
-              <p className="font-medium">{clienteBase.senhaINSS || "—"}</p>
+              <p className="font-medium">{cliente.senhaINSS || "—"}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Benefício Desejado</span>
-              <p className="font-medium">{clienteBase.beneficioDesejado}</p>
+              <p className="font-medium">{cliente.beneficioDesejado}</p>
             </div>
           </div>
         </CardContent>
@@ -93,7 +151,7 @@ const ClienteDetalhe = () => {
       <Card>
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 space-y-0">
           <CardTitle className="text-lg">Movimentações do Processo</CardTitle>
-          <Button size="sm" onClick={() => setShowAdd(true)} className="w-full sm:w-auto">
+          <Button size="sm" onClick={openNewMov} className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Nova Movimentação
           </Button>
@@ -108,10 +166,16 @@ const ClienteDetalhe = () => {
             <div className="relative pl-6 border-l-2 border-border space-y-6">
               {sorted.map((mov) => (
                 <div key={mov.id} className="relative">
-                  <div className="absolute -left-[1.85rem] top-1 h-3 w-3 rounded-full bg-primary border-2 border-card" />
-                  <div className="space-y-1">
-                    <p className="font-medium text-sm text-foreground">{mov.descricao}</p>
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                  <div className="absolute -left-[1.85rem] top-1.5 h-3 w-3 rounded-full bg-primary border-2 border-card" />
+                  <button
+                    type="button"
+                    onClick={() => setViewMov(mov)}
+                    className="w-full text-left rounded-md p-2 -m-2 hover:bg-muted/60 transition-colors"
+                  >
+                    <p className="font-medium text-sm text-foreground break-words whitespace-normal">
+                      {mov.titulo}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mt-1">
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
                         {new Date(mov.data).toLocaleDateString("pt-BR")}
@@ -121,7 +185,7 @@ const ClienteDetalhe = () => {
                         {mov.advogado}
                       </span>
                     </div>
-                  </div>
+                  </button>
                 </div>
               ))}
             </div>
@@ -129,29 +193,125 @@ const ClienteDetalhe = () => {
         </CardContent>
       </Card>
 
-      {/* Add Movimentação Dialog */}
-      <Dialog open={showAdd} onOpenChange={setShowAdd}>
+      {/* View Movimentação Dialog */}
+      <Dialog open={!!viewMov} onOpenChange={(o) => !o && setViewMov(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Nova Movimentação</DialogTitle>
-            <DialogDescription>Registre uma nova movimentação para este processo.</DialogDescription>
+            <DialogTitle className="break-words whitespace-normal pr-6">
+              {viewMov?.titulo}
+            </DialogTitle>
+            <DialogDescription className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-2">
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                {viewMov && new Date(viewMov.data).toLocaleDateString("pt-BR")}
+              </span>
+              <span className="flex items-center gap-1">
+                <User className="h-3 w-3" />
+                {viewMov?.advogado}
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <p className="text-sm text-foreground whitespace-pre-wrap break-words">
+            {viewMov?.descricao}
+          </p>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => viewMov && openEditMov(viewMov)}>
+              <Pencil className="h-4 w-4 mr-2" />
+              Editar
+            </Button>
+            <Button variant="destructive" onClick={() => viewMov && setDeleteMov(viewMov)}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Excluir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add/Edit Movimentação Dialog */}
+      <Dialog open={showMovForm} onOpenChange={setShowMovForm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingMov ? "Editar Movimentação" : "Nova Movimentação"}</DialogTitle>
+            <DialogDescription>
+              {editingMov ? "Altere os dados da movimentação." : "Registre uma nova movimentação para este processo."}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
+              <Label>Título *</Label>
+              <Input
+                value={movForm.titulo}
+                onChange={(e) => setMovForm({ ...movForm, titulo: e.target.value })}
+                placeholder="Ex: Perícia agendada"
+              />
+            </div>
+            <div className="space-y-2">
               <Label>Descrição *</Label>
-              <Textarea value={novaDesc} onChange={(e) => setNovaDesc(e.target.value)} placeholder="Descreva a movimentação..." />
+              <Textarea
+                value={movForm.descricao}
+                onChange={(e) => setMovForm({ ...movForm, descricao: e.target.value })}
+                placeholder="Descreva a movimentação..."
+                rows={4}
+              />
             </div>
             <div className="space-y-2">
               <Label>Data *</Label>
-              <Input type="date" value={novaData} onChange={(e) => setNovaData(e.target.value)} />
+              <Input type="date" value={movForm.data} onChange={(e) => setMovForm({ ...movForm, data: e.target.value })} />
             </div>
             <div className="space-y-2">
               <Label>Advogado Responsável</Label>
-              <Input value="Dr. Carlos Mendes" disabled className="bg-muted" />
+              <Input value={editingMov?.advogado || "Dr. Carlos Mendes"} disabled className="bg-muted" />
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={handleAddMov}>Adicionar</Button>
+            <Button onClick={handleSaveMov}>{editingMov ? "Salvar" : "Adicionar"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Movimentação Confirmation */}
+      <Dialog open={!!deleteMov} onOpenChange={(o) => !o && setDeleteMov(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir a movimentação <strong>{deleteMov?.titulo}</strong>? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteMov(null)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleDeleteMov}>Excluir</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Cliente Dialog */}
+      <Dialog open={showEditCliente} onOpenChange={setShowEditCliente}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Cliente</DialogTitle>
+            <DialogDescription>Altere os dados do cliente.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nome *</Label>
+              <Input value={clienteForm.nome} onChange={(e) => setClienteForm({ ...clienteForm, nome: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>CPF *</Label>
+              <Input value={clienteForm.cpf} onChange={(e) => setClienteForm({ ...clienteForm, cpf: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Senha INSS</Label>
+              <Input value={clienteForm.senhaINSS} onChange={(e) => setClienteForm({ ...clienteForm, senhaINSS: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Benefício Desejado *</Label>
+              <Input value={clienteForm.beneficioDesejado} onChange={(e) => setClienteForm({ ...clienteForm, beneficioDesejado: e.target.value })} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleEditCliente}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

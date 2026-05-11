@@ -7,6 +7,7 @@ export interface Advogado {
 
 export interface Movimentacao {
   id: string;
+  titulo: string;
   descricao: string;
   data: string;
   advogado: string;
@@ -35,9 +36,9 @@ export const clientesMock: Cliente[] = [
     senhaINSS: "abc12345",
     beneficioDesejado: "Aposentadoria por Idade",
     movimentacoes: [
-      { id: "m1", descricao: "Protocolo inicial realizado junto ao INSS", data: "2024-01-15", advogado: "Dr. Carlos Mendes" },
-      { id: "m2", descricao: "Juntada de documentos complementares", data: "2024-02-20", advogado: "Dra. Ana Beatriz Silva" },
-      { id: "m3", descricao: "Perícia médica agendada para 15/04/2024", data: "2024-03-10", advogado: "Dr. Carlos Mendes" },
+      { id: "m1", titulo: "Protocolo inicial no INSS", descricao: "Protocolo inicial realizado junto ao INSS com toda a documentação básica do segurado.", data: "2024-01-15", advogado: "Dr. Carlos Mendes" },
+      { id: "m2", titulo: "Juntada de documentos", descricao: "Juntada de documentos complementares solicitados pelo perito do INSS.", data: "2024-02-20", advogado: "Dra. Ana Beatriz Silva" },
+      { id: "m3", titulo: "Perícia médica agendada", descricao: "Perícia médica agendada para 15/04/2024 na agência do INSS mais próxima.", data: "2024-03-10", advogado: "Dr. Carlos Mendes" },
     ],
   },
   {
@@ -47,8 +48,8 @@ export const clientesMock: Cliente[] = [
     senhaINSS: "xyz98765",
     beneficioDesejado: "Auxílio-Doença",
     movimentacoes: [
-      { id: "m4", descricao: "Consulta inicial e análise de documentação", data: "2024-03-01", advogado: "Dr. Roberto Almeida" },
-      { id: "m5", descricao: "Requerimento administrativo protocolado", data: "2024-03-15", advogado: "Dr. Roberto Almeida" },
+      { id: "m4", titulo: "Consulta inicial", descricao: "Consulta inicial e análise de documentação apresentada pelo cliente.", data: "2024-03-01", advogado: "Dr. Roberto Almeida" },
+      { id: "m5", titulo: "Requerimento protocolado", descricao: "Requerimento administrativo protocolado junto ao INSS.", data: "2024-03-15", advogado: "Dr. Roberto Almeida" },
     ],
   },
   {
@@ -58,7 +59,7 @@ export const clientesMock: Cliente[] = [
     senhaINSS: "fer2024",
     beneficioDesejado: "BPC/LOAS",
     movimentacoes: [
-      { id: "m6", descricao: "Cadastro no CadÚnico verificado", data: "2024-02-10", advogado: "Dra. Ana Beatriz Silva" },
+      { id: "m6", titulo: "CadÚnico verificado", descricao: "Cadastro no CadÚnico verificado e atualizado junto ao CRAS local.", data: "2024-02-10", advogado: "Dra. Ana Beatriz Silva" },
     ],
   },
   {
