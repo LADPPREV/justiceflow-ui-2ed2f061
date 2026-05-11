@@ -33,7 +33,10 @@ const ClienteDetalhe = () => {
     cpf: clienteBase?.cpf || "",
     senhaINSS: clienteBase?.senhaINSS || "",
     beneficioDesejado: clienteBase?.beneficioDesejado || "",
+    agenteCaso: clienteBase?.agenteCaso || "",
+    indicadoPor: clienteBase?.indicadoPor || "",
   });
+  const [showDeleteCliente, setShowDeleteCliente] = useState(false);
 
   if (!cliente) {
     return (
@@ -97,9 +100,21 @@ const ClienteDetalhe = () => {
       toast.error("Preencha os campos obrigatórios.");
       return;
     }
-    setCliente({ ...cliente, ...clienteForm });
+    const isIndicacao = clienteForm.agenteCaso.trim().toLowerCase() === "indicação" || clienteForm.agenteCaso.trim().toLowerCase() === "indicacao";
+    setCliente({
+      ...cliente,
+      ...clienteForm,
+      indicadoPor: isIndicacao ? clienteForm.indicadoPor : undefined,
+    });
     setShowEditCliente(false);
     toast.success("Cliente atualizado com sucesso!");
+  };
+
+  const handleDeleteCliente = () => {
+    const idx = clientesMock.findIndex((c) => c.id === cliente.id);
+    if (idx >= 0) clientesMock.splice(idx, 1);
+    toast.success("Cliente excluído com sucesso!");
+    navigate("/clientes");
   };
 
   const sorted = [...movimentacoes].sort((a, b) => a.data.localeCompare(b.data));
@@ -117,13 +132,26 @@ const ClienteDetalhe = () => {
       <Card>
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 space-y-0">
           <CardTitle className="text-lg">Dados Cadastrais</CardTitle>
-          <Button size="sm" variant="outline" onClick={() => {
-            setClienteForm({ nome: cliente.nome, cpf: cliente.cpf, senhaINSS: cliente.senhaINSS, beneficioDesejado: cliente.beneficioDesejado });
-            setShowEditCliente(true);
-          }} className="w-full sm:w-auto">
-            <Pencil className="h-4 w-4 mr-2" />
-            Editar
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button size="sm" variant="outline" onClick={() => {
+              setClienteForm({
+                nome: cliente.nome,
+                cpf: cliente.cpf,
+                senhaINSS: cliente.senhaINSS,
+                beneficioDesejado: cliente.beneficioDesejado,
+                agenteCaso: cliente.agenteCaso || "",
+                indicadoPor: cliente.indicadoPor || "",
+              });
+              setShowEditCliente(true);
+            }} className="w-full sm:w-auto">
+              <Pencil className="h-4 w-4 mr-2" />
+              Editar
+            </Button>
+            <Button size="sm" variant="destructive" onClick={() => setShowDeleteCliente(true)} className="w-full sm:w-auto">
+              <Trash2 className="h-4 w-4 mr-2" />
+              Excluir
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -142,6 +170,17 @@ const ClienteDetalhe = () => {
             <div>
               <span className="text-muted-foreground">Benefício Desejado</span>
               <p className="font-medium">{cliente.beneficioDesejado}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Agente do Caso</span>
+              <p className="font-medium">
+                {cliente.agenteCaso || "—"}
+                {cliente.indicadoPor ? (
+                  <span className="block text-xs text-muted-foreground font-normal mt-0.5">
+                    Indicado por: {cliente.indicadoPor}
+                  </span>
+                ) : null}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -309,9 +348,43 @@ const ClienteDetalhe = () => {
               <Label>Benefício Desejado *</Label>
               <Input value={clienteForm.beneficioDesejado} onChange={(e) => setClienteForm({ ...clienteForm, beneficioDesejado: e.target.value })} />
             </div>
+            <div className="space-y-2">
+              <Label>Agente do Caso</Label>
+              <Input
+                value={clienteForm.agenteCaso}
+                onChange={(e) => setClienteForm({ ...clienteForm, agenteCaso: e.target.value })}
+                placeholder="Ex: Indicação, Instagram, Facebook..."
+              />
+            </div>
+            {clienteForm.agenteCaso.trim().toLowerCase() === "indicação" || clienteForm.agenteCaso.trim().toLowerCase() === "indicacao" ? (
+              <div className="space-y-2">
+                <Label>Indicado por</Label>
+                <Input
+                  value={clienteForm.indicadoPor}
+                  onChange={(e) => setClienteForm({ ...clienteForm, indicadoPor: e.target.value })}
+                  placeholder="Nome de quem indicou"
+                />
+              </div>
+            ) : null}
           </div>
           <DialogFooter>
             <Button onClick={handleEditCliente}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Cliente Confirmation */}
+      <Dialog open={showDeleteCliente} onOpenChange={setShowDeleteCliente}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir o cliente <strong>{cliente.nome}</strong>? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteCliente(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleDeleteCliente}>Excluir</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

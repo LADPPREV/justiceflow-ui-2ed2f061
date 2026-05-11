@@ -19,6 +19,8 @@ export interface Cliente {
   cpf: string;
   senhaINSS: string;
   beneficioDesejado: string;
+  agenteCaso: string;
+  indicadoPor?: string;
   movimentacoes: Movimentacao[];
 }
 
@@ -35,6 +37,8 @@ export const clientesMock: Cliente[] = [
     cpf: "111.222.333-44",
     senhaINSS: "abc12345",
     beneficioDesejado: "Aposentadoria por Idade",
+    agenteCaso: "Indicação",
+    indicadoPor: "João Pereira (cliente antigo)",
     movimentacoes: [
       { id: "m1", titulo: "Protocolo inicial no INSS", descricao: "Protocolo inicial realizado junto ao INSS com toda a documentação básica do segurado.", data: "2024-01-15", advogado: "Dr. Carlos Mendes" },
       { id: "m2", titulo: "Juntada de documentos", descricao: "Juntada de documentos complementares solicitados pelo perito do INSS.", data: "2024-02-20", advogado: "Dra. Ana Beatriz Silva" },
@@ -47,6 +51,7 @@ export const clientesMock: Cliente[] = [
     cpf: "555.666.777-88",
     senhaINSS: "xyz98765",
     beneficioDesejado: "Auxílio-Doença",
+    agenteCaso: "Instagram",
     movimentacoes: [
       { id: "m4", titulo: "Consulta inicial", descricao: "Consulta inicial e análise de documentação apresentada pelo cliente.", data: "2024-03-01", advogado: "Dr. Roberto Almeida" },
       { id: "m5", titulo: "Requerimento protocolado", descricao: "Requerimento administrativo protocolado junto ao INSS.", data: "2024-03-15", advogado: "Dr. Roberto Almeida" },
@@ -58,6 +63,7 @@ export const clientesMock: Cliente[] = [
     cpf: "999.888.777-66",
     senhaINSS: "fer2024",
     beneficioDesejado: "BPC/LOAS",
+    agenteCaso: "Facebook",
     movimentacoes: [
       { id: "m6", titulo: "CadÚnico verificado", descricao: "Cadastro no CadÚnico verificado e atualizado junto ao CRAS local.", data: "2024-02-10", advogado: "Dra. Ana Beatriz Silva" },
     ],
@@ -68,6 +74,8 @@ export const clientesMock: Cliente[] = [
     cpf: "333.444.555-66",
     senhaINSS: "fac2023",
     beneficioDesejado: "Aposentadoria por Invalidez",
+    agenteCaso: "Indicação",
+    indicadoPor: "Dra. Paula Ramos",
     movimentacoes: [],
   },
 ];
