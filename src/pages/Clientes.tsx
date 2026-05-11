@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Eye, Pencil, Trash2, Plus, Search } from "lucide-react";
+import { Trash2, Plus, Search, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { Users } from "lucide-react";
 
@@ -15,7 +15,6 @@ const Clientes = () => {
   const [clientes, setClientes] = useState<Cliente[]>(clientesMock);
   const [busca, setBusca] = useState("");
   const [showAdd, setShowAdd] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const [selected, setSelected] = useState<Cliente | null>(null);
   const [form, setForm] = useState({ nome: "", cpf: "", senhaINSS: "", beneficioDesejado: "" });
@@ -40,14 +39,6 @@ const Clientes = () => {
     toast.success("Cliente cadastrado com sucesso!");
   };
 
-  const handleEdit = () => {
-    if (!selected) return;
-    setClientes(clientes.map((c) => (c.id === selected.id ? { ...c, ...form } : c)));
-    setShowEdit(false);
-    resetForm();
-    toast.success("Cliente atualizado com sucesso!");
-  };
-
   const handleDelete = () => {
     if (!selected) return;
     setClientes(clientes.filter((c) => c.id !== selected.id));
@@ -56,13 +47,8 @@ const Clientes = () => {
     toast.success("Cliente excluído com sucesso!");
   };
 
-  const openEdit = (c: Cliente) => {
-    setSelected(c);
-    setForm({ nome: c.nome, cpf: c.cpf, senhaINSS: c.senhaINSS, beneficioDesejado: c.beneficioDesejado });
-    setShowEdit(true);
-  };
-
-  const openDelete = (c: Cliente) => {
+  const openDelete = (e: React.MouseEvent, c: Cliente) => {
+    e.stopPropagation();
     setSelected(c);
     setShowDelete(true);
   };
@@ -127,7 +113,11 @@ const Clientes = () => {
             </TableHeader>
             <TableBody>
               {filtered.map((c) => (
-                <TableRow key={c.id}>
+                <TableRow
+                  key={c.id}
+                  onClick={() => navigate(`/clientes/${c.id}`)}
+                  className="cursor-pointer"
+                >
                   <TableCell className="font-medium">
                     {c.nome}
                     <div className="sm:hidden text-xs text-muted-foreground mt-1">{c.cpf}</div>
@@ -135,15 +125,10 @@ const Clientes = () => {
                   <TableCell className="hidden sm:table-cell">{c.cpf}</TableCell>
                   <TableCell className="hidden md:table-cell">{c.beneficioDesejado}</TableCell>
                   <TableCell className="text-right space-x-1">
-                    <Button variant="ghost" size="icon" onClick={() => navigate(`/clientes/${c.id}`)} title="Visualizar">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => openEdit(c)} title="Editar">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => openDelete(c)} title="Excluir" className="text-destructive hover:text-destructive">
+                    <Button variant="ghost" size="icon" onClick={(e) => openDelete(e, c)} title="Excluir" className="text-destructive hover:text-destructive">
                       <Trash2 className="h-4 w-4" />
                     </Button>
+                    <ChevronRight className="h-4 w-4 inline-block text-muted-foreground" />
                   </TableCell>
                 </TableRow>
               ))}
@@ -162,20 +147,6 @@ const Clientes = () => {
           {formFields}
           <DialogFooter>
             <Button onClick={handleAdd}>Cadastrar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Dialog */}
-      <Dialog open={showEdit} onOpenChange={setShowEdit}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Editar Cliente</DialogTitle>
-            <DialogDescription>Altere os dados do cliente selecionado.</DialogDescription>
-          </DialogHeader>
-          {formFields}
-          <DialogFooter>
-            <Button onClick={handleEdit}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
